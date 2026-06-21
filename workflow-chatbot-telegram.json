@@ -168,8 +168,8 @@
       "webhookId": "37ea9674-d1ca-4c2f-9045-f4c79d25fe53",
       "credentials": {
         "telegramApi": {
-          "id": "JR4D5bch08BR9LaV",
-          "name": "Telegram account"
+          "id": "rOfUrJUzKAZ7tIDQ",
+          "name": "Telegram account 2"
         }
       }
     },
@@ -190,8 +190,8 @@
       "webhookId": "44e128c8-f6c2-43f9-85da-a81b10d48168",
       "credentials": {
         "telegramApi": {
-          "id": "JR4D5bch08BR9LaV",
-          "name": "Telegram account"
+          "id": "rOfUrJUzKAZ7tIDQ",
+          "name": "Telegram account 2"
         }
       }
     }
@@ -265,7 +265,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c789a7c9-1f62-45d7-bf47-df6e16d6946e",
+  "versionId": "652fc05d-d642-4bb7-b2eb-6290070e8909",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b8cd047bda57e8a98e9733f36d1c0e2f0ae93ed598ed826b0361c3b381c8753a"
