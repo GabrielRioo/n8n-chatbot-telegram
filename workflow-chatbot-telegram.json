@@ -1,0 +1,282 @@
+{
+  "name": "Projeto FTR - Telegram Clima",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3e5b2a65-27bf-4ebb-90f8-c6e1d3d24a32",
+      "name": "Telegram Trigger",
+      "webhookId": "ca06e094-f504-421c-93a4-1b4fcc25e58e",
+      "credentials": {
+        "telegramApi": {
+          "id": "rOfUrJUzKAZ7tIDQ",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "57a00879-df33-4b3c-b429-d1a354bfb32f",
+              "name": "queue",
+              "value": "={{ $json.message.text.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "55772009-a6f2-4366-bac6-d48b1fd43311",
+      "name": "Formatar Cidade"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.queue }}"
+            },
+            {
+              "name": "units",
+              "value": "metric"
+            },
+            {
+              "name": "lang",
+              "value": "pt_br"
+            },
+            {
+              "name": "appid",
+              "value": "={{ $env[\"OPENWEATHER_API_KEY\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "eadfea2c-01d8-42dd-a160-c78b3ab6aa63",
+      "name": "Buscar Clima",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f3daa2f-18e2-422a-985f-b568a3e7963e",
+              "name": "message",
+              "value": "=A temperatura em {{ $json.name }} é de {{ Math.round($json.main.temp) }}°C.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -112
+      ],
+      "id": "219f5075-6285-4b3b-9192-3e685bcb9a54",
+      "name": "Montar Resposta"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aa705dfd-9086-490e-abfb-96a23f7e89d6",
+              "leftValue": "={{ $json.main }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "05663334-a492-411c-bb28-63a188ec651f",
+              "leftValue": "={{ $json.main.temp }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "62e07729-f7a3-4bbf-9d38-0d2d0494dc6a",
+      "name": "Validar Resposta"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}_message",
+        "text": "=🌤️ {{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        -112
+      ],
+      "id": "ebb1741b-b3dd-4472-80b0-e70ea0fba3de",
+      "name": "Envia Mensagem",
+      "webhookId": "37ea9674-d1ca-4c2f-9045-f4c79d25fe53",
+      "credentials": {
+        "telegramApi": {
+          "id": "JR4D5bch08BR9LaV",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}_message",
+        "text": "❌ Cidade não encontrada. Use o formato Cidade, UF, BR (ex.: São Paulo, SP, BR).",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        96
+      ],
+      "id": "8f8ed849-3608-4dab-b286-516118256215",
+      "name": "Send a text message",
+      "webhookId": "44e128c8-f6c2-43f9-85da-a81b10d48168",
+      "credentials": {
+        "telegramApi": {
+          "id": "JR4D5bch08BR9LaV",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Formatar Cidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar Cidade": {
+      "main": [
+        [
+          {
+            "node": "Buscar Clima",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Clima": {
+      "main": [
+        [
+          {
+            "node": "Validar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Resposta": {
+      "main": [
+        [
+          {
+            "node": "Envia Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Resposta": {
+      "main": [
+        [
+          {
+            "node": "Montar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c789a7c9-1f62-45d7-bf47-df6e16d6946e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b8cd047bda57e8a98e9733f36d1c0e2f0ae93ed598ed826b0361c3b381c8753a"
+  },
+  "id": "rv3nR3lLPXF3zriJ",
+  "tags": [
+    {
+      "updatedAt": "2026-06-20T16:54:43.566Z",
+      "createdAt": "2026-06-20T16:54:43.566Z",
+      "id": "w9foRIZCsRk6hWyB",
+      "name": "Projetos"
+    }
+  ]
+}
